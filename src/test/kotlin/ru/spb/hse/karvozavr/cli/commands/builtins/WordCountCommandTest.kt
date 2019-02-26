@@ -8,7 +8,7 @@ import ru.spb.hse.karvozavr.cli.streams.ReadWriteStream
 import ru.spb.hse.karvozavr.cli.util.ExitCode
 import java.nio.file.Paths
 
-class WordcountCommandTest {
+class WordCountCommandTest {
 
     private val testDirecory = Paths.get("src", "test", "resources").toAbsolutePath()
     private val file1 = (testDirecory.resolve("file1.txt")).toString()
@@ -19,7 +19,7 @@ class WordcountCommandTest {
         val errStream = ReadWriteStream()
         val outStream = ReadWriteStream()
 
-        val cmd = WordcountCommand(listOf(emptyFile), EmptyStream, outStream, errStream, CliShell.emptyShell())
+        val cmd = WordCountCommand(listOf(emptyFile), EmptyStream, outStream, errStream, CliShell.emptyShell())
 
         assertEquals(ExitCode.SUCCESS, cmd.execute())
         assertEquals(true, outStream.isNotEmpty())
@@ -33,7 +33,7 @@ class WordcountCommandTest {
         val errStream = ReadWriteStream()
         val outStream = ReadWriteStream()
 
-        val cmd = WordcountCommand(listOf(file1), EmptyStream, outStream, errStream, CliShell.emptyShell())
+        val cmd = WordCountCommand(listOf(file1), EmptyStream, outStream, errStream, CliShell.emptyShell())
 
         assertEquals(ExitCode.SUCCESS, cmd.execute())
         assertEquals(true, outStream.isNotEmpty())
