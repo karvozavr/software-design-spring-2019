@@ -3,8 +3,15 @@ package ru.spb.hse.karvozavr.cli.parser
 import org.junit.Test
 
 import org.junit.Assert.*
+import ru.spb.hse.karvozavr.cli.pipeline.Pipeline
+import ru.spb.hse.karvozavr.cli.pipeline.PipelineFactory
 import ru.spb.hse.karvozavr.cli.shell.CliShell
 import ru.spb.hse.karvozavr.cli.shell.env.CliEnvironment
+import ru.spb.hse.karvozavr.cli.streams.EmptyStream
+import ru.spb.hse.karvozavr.cli.streams.ReadWriteStream
+import ru.spb.hse.karvozavr.cli.util.ExitCode
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class CommandParserTest {
 
@@ -84,10 +91,24 @@ class CommandParserTest {
         val cmd = "echo b\$a \$bbb\$ccc r | cat | echo \$a\$c \'\$ccc\' | cat"
         val parsedValue = CommandParser.parse(cmd, env)
         assertArrayEquals(
-            arrayOf(CommandNode("echo", listOf("bbaz", "bc", "r")),
+            arrayOf(
+                CommandNode("echo", listOf("bbaz", "bc", "r")),
                 CommandNode("cat", listOf()),
                 CommandNode("echo", listOf("baz", "\$ccc")),
-                CommandNode("cat", listOf())),
+                CommandNode("cat", listOf())
+            ),
+            parsedValue.toTypedArray()
+        )
+        println(parsedValue)
+    }
+
+    @Test
+    fun testInterpolationBeforeStrongQuoting() {
+        val env = CliEnvironment(mutableMapOf("t" to "test"))
+        val cmd = "echo \$t'\$t'"
+        val parsedValue = CommandParser.parse(cmd, env)
+        assertArrayEquals(
+            arrayOf(CommandNode("echo", listOf("test\$t"))),
             parsedValue.toTypedArray()
         )
         println(parsedValue)

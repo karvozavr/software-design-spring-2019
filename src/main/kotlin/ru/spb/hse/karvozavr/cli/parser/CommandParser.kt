@@ -103,6 +103,8 @@ object CommandParser {
                 } else if (weakQuoting) {
                     stringBuilder.append(c)
                 } else {
+                    tokens.add(InterpolationToken(stringBuilder.toString()))
+                    stringBuilder.clear()
                     strongQuoting = true
                 }
                 '\"' -> if (weakQuoting) {
@@ -112,6 +114,8 @@ object CommandParser {
                 } else if (strongQuoting) {
                     stringBuilder.append(c)
                 } else {
+                    tokens.add(InterpolationToken(stringBuilder.toString()))
+                    stringBuilder.clear()
                     weakQuoting = true
                 }
                 '=' -> {
