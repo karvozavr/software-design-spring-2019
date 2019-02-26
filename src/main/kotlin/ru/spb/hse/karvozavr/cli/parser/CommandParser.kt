@@ -80,46 +80,51 @@ object CommandParser {
         return tokens.map { it.interpolate(env) }
     }
 
+    private enum class QuotingState {
+        NEUTRAL,
+        WEAK_QUOTING,
+        STRONG_QUOTING
+    }
+
     private fun tokenize(string: String): List<Token> {
         val tokens = mutableListOf<Token>()
         val stringBuilder = StringBuilder()
 
-        var weakQuoting = false
-        var strongQuoting = false
+        var quotingState = QuotingState.NEUTRAL
 
         for (c in string) {
             when (c) {
-                ' ' -> if (weakQuoting || strongQuoting) {
+                ' ' -> if (quotingState != QuotingState.NEUTRAL) {
                     stringBuilder.append(c)
                 } else {
                     tokens.add(InterpolationToken(stringBuilder.toString()))
                     stringBuilder.clear()
                     tokens.add(WhitespaceToken)
                 }
-                '\'' -> if (strongQuoting) {
+                '\'' -> if (quotingState == QuotingState.STRONG_QUOTING) {
                     tokens.add(ValueToken(stringBuilder.toString()))
                     stringBuilder.clear()
-                    strongQuoting = false
-                } else if (weakQuoting) {
+                    quotingState = QuotingState.NEUTRAL
+                } else if (quotingState == QuotingState.WEAK_QUOTING) {
                     stringBuilder.append(c)
                 } else {
                     tokens.add(InterpolationToken(stringBuilder.toString()))
                     stringBuilder.clear()
-                    strongQuoting = true
+                    quotingState = QuotingState.STRONG_QUOTING
                 }
-                '\"' -> if (weakQuoting) {
+                '\"' -> if (quotingState == QuotingState.WEAK_QUOTING) {
                     tokens.add(InterpolationToken(stringBuilder.toString()))
                     stringBuilder.clear()
-                    weakQuoting = false
-                } else if (strongQuoting) {
+                    quotingState = QuotingState.NEUTRAL
+                } else if (quotingState == QuotingState.STRONG_QUOTING) {
                     stringBuilder.append(c)
                 } else {
                     tokens.add(InterpolationToken(stringBuilder.toString()))
                     stringBuilder.clear()
-                    weakQuoting = true
+                    quotingState = QuotingState.WEAK_QUOTING
                 }
                 '=' -> {
-                    if (weakQuoting or strongQuoting) {
+                    if (quotingState != QuotingState.NEUTRAL) {
                         stringBuilder.append(c)
                     } else {
                         tokens.add(InterpolationToken(stringBuilder.toString()))
@@ -127,7 +132,7 @@ object CommandParser {
                         tokens.add(AssignmentToken)
                     }
                 }
-                '|' -> if (weakQuoting or strongQuoting) {
+                '|' -> if (quotingState != QuotingState.NEUTRAL) {
                     stringBuilder.append(c)
                 } else {
                     tokens.add(InterpolationToken(stringBuilder.toString()))
@@ -141,7 +146,7 @@ object CommandParser {
         if (stringBuilder.isNotEmpty())
             tokens.add(InterpolationToken(stringBuilder.toString()))
 
-        if (weakQuoting || strongQuoting) {
+        if (quotingState != QuotingState.NEUTRAL) {
             throw ParseException("Mismatched quote.")
         }
 
