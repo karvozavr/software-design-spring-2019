@@ -2,10 +2,19 @@ package ru.spb.hse.karvozavr.cli.parser
 
 import ru.spb.hse.karvozavr.cli.shell.env.Environment
 
+/**
+ * Parser exception.
+ */
 class ParseException(err: String) : RuntimeException(err)
 
+/**
+ * Parser for shell commands.
+ */
 object CommandParser {
 
+    /**
+     * Parses command with interpolation in context of given environment.
+     */
     fun parse(command: String, env: Environment): List<CommandNode> =
         createPipeline(collapseTokens(interpolateTokens(tokenize(command), env)))
 
