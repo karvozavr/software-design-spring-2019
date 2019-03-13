@@ -12,7 +12,7 @@ import java.nio.file.Paths
 /**
  * Wordcount command.
  */
-class WordcountCommand(
+class WordCountCommand(
     args: List<String>,
     inputStream: InStream,
     outStream: OutStream,

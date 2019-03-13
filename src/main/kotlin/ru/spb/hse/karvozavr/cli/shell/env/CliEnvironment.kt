@@ -18,7 +18,7 @@ class CliEnvironment(
         currentDir
 
     override fun changeDirectory(newDir: Path) {
-        currentDir = Paths.get(newDir.toString())
+        currentDir = newDir
     }
 
     override fun shellPrompt(): String {

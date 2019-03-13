@@ -25,6 +25,11 @@ class ExternalCommand(
     private val inFile = Files.createTempFile("pipetempin", ".tmp")
     private val outFile = Files.createTempFile("pipetempout", ".tmp")
 
+    init {
+        inFile.toFile().deleteOnExit()
+        outFile.toFile().deleteOnExit()
+    }
+
     override fun execute(): ExitCode {
         return try {
             val commandList = listOf(command) + args

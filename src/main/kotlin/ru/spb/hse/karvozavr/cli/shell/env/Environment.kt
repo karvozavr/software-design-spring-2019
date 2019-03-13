@@ -35,4 +35,3 @@ interface Environment {
      */
     fun shellPrompt(): String
 }
-
